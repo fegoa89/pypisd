@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "pypisd"
+version = "0.1.0"
+description = "CLI tool to fetch source distribution url links from https://pypi.org for a given python package and its version."
+authors = ["Fernando <fegoa89@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+pypisd = "pypisd.main:app"
