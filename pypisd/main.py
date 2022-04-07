@@ -22,7 +22,7 @@ def get_source_distribution_link_for_library(library, timeout=10):
 def cli():
     lib_list_bytes = get_pip_list_stdout()
     lib_list = extract_lib_list_from_bytes_output(lib_list_bytes)
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
         for library in lib_list:
             futures.append(executor.submit(get_source_distribution_link_for_library, library=library))
