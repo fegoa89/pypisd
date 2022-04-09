@@ -1,3 +1,4 @@
+import argparse
 import csv
 import requests
 from subprocess import Popen, PIPE, STDOUT
@@ -5,6 +6,10 @@ import concurrent.futures
 from bs4 import BeautifulSoup
 
 def cli():
+    parser = argparse.ArgumentParser()
+    # Adding optional argument
+    parser.add_argument("-o", "--output_file", help = "File where the source distribution links will be saved, default 'pypi_sd_links.csv'")
+    args = parser.parse_args()
     lib_list_bytes = get_pip_list_stdout()
     lib_list = extract_lib_list_from_bytes_output(lib_list_bytes)
     source_distribution_list = list()
@@ -15,7 +20,7 @@ def cli():
         for future in concurrent.futures.as_completed(futures):
             source_distribution_list.append(future.result())
 
-    write_library_info_to_csv(source_distribution_list)
+    write_library_info_to_csv(source_distribution_list, args.output_file)
 
 def get_pip_list_stdout() -> bytes:
     pip_freeze_process = Popen(['pip', 'list'], stdout=PIPE, stderr=STDOUT)
@@ -52,8 +57,9 @@ def get_source_distribution_link_for_library(library, version, timeout=10):
     else:
         return [library, version if version else "using latest version", library_license, f"Can not find download link for {library}, version {version}"]
 
-def write_library_info_to_csv(sd_list):
-    with open('pypi_sd_links.csv', 'w', encoding='UTF8', newline='') as f:
+def write_library_info_to_csv(sd_list, file_name):
+    file_name = file_name if file_name else 'pypi_sd_links.csv'
+    with open(file_name, 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
         # write the header
         writer.writerow(["library_name", "version", "license", "source_distribution_link"])
