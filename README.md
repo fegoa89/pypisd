@@ -31,7 +31,6 @@ The file has the following columns:
 - license: Defines the license that the library uses
 - source_distribution_link: Link to download the source distribution for this given library&version. If not found, it will be replaced by "Can not find download link for My Library, version 0.0.1"
 
-|library_name | version | license | source_distribution_link|
 
 | library_name      | version | license | source_distribution_link |
 | ----------- | ----------- | ----------- | ----------- |
