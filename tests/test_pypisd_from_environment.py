@@ -41,7 +41,7 @@ def test_pypisd_default_file_output_name():
     cli()
     assert os.path.isfile("pypi_sd_links.csv") == True
 
-@mock.patch('pypisd.main.argparse.ArgumentParser.parse_args', return_value=argparse.Namespace(output_file="myfile.csv"))
+@mock.patch('pypisd.main.argparse.ArgumentParser.parse_args', return_value=argparse.Namespace(output_file="myfile.csv", input_file=None))
 def test_pypisd_file_output_name_if_provided_by_input(mock_args):
     cli()
     assert os.path.isfile("myfile.csv") == True

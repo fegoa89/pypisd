@@ -1,5 +1,7 @@
-import argparse
+import os
+import re
 import csv
+import argparse
 import requests
 from subprocess import Popen, PIPE, STDOUT
 import concurrent.futures
@@ -7,20 +9,44 @@ from bs4 import BeautifulSoup
 
 def cli():
     parser = argparse.ArgumentParser()
-    # Adding optional argument
+    parser.add_argument("-i", "--input_file", help = "File use to read libraries from instead of the environment")
     parser.add_argument("-o", "--output_file", help = "File where the source distribution links will be saved, default 'pypi_sd_links.csv'")
     args = parser.parse_args()
+    if args.input_file:
+        # Get libraries from file
+        lib_list = fetch_libraries_from_file(args.input_file)
+    else:
+        # Get libraries from environment
+        lib_list = fetch_libraries_from_environment()
+
+    # Fetch source distribution download link for each library & version
+    source_distribution_list = fetch__and_extract_details_for_library_list(lib_list)
+    # Write source distribution list to CSV
+    write_library_info_to_csv(source_distribution_list, args.output_file)
+
+def fetch_libraries_from_environment() -> list(list()):
     lib_list_bytes = get_pip_list_stdout()
-    lib_list = extract_lib_list_from_bytes_output(lib_list_bytes)
+    return extract_lib_list_from_bytes_output(lib_list_bytes)
+
+def fetch_libraries_from_file(file_path) -> list(list()):
+    if not os.path.isfile(file_path):
+        print("Input file do not exist")
+
+    with open(file_path) as f:
+        lines = f.readlines()
+        return [re.split("[<|>|~=|==|!=|<=|>=|===|, \!?:]+", line.strip()) for line in lines]
+
+def fetch__and_extract_details_for_library_list(lib_list: list) -> list(list()):
     source_distribution_list = list()
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
         for library in lib_list:
-            futures.append(executor.submit(get_source_distribution_link_for_library, library=library[0], version=library[1]))
+            version = library[1] if len(library) == 2 else None
+            futures.append(executor.submit(get_source_distribution_link_for_library, library=library[0], version=version))
         for future in concurrent.futures.as_completed(futures):
             source_distribution_list.append(future.result())
 
-    write_library_info_to_csv(source_distribution_list, args.output_file)
+    return source_distribution_list
 
 def get_pip_list_stdout() -> bytes:
     pip_freeze_process = Popen(['pip', 'list'], stdout=PIPE, stderr=STDOUT)
@@ -39,7 +65,7 @@ def extract_lib_list_from_bytes_output(pip_stdout: bytes) -> list:
 
     return lib_list
 
-def get_source_distribution_link_for_library(library, version, timeout=10):
+def get_source_distribution_link_for_library(library, version, timeout=10) -> list:
     if version:
         url = f"https://pypi.org/project/{library}/{version}/#files"
     else:
