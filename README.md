@@ -7,7 +7,7 @@ CLI tool to fetch source distribution url links from https://pypi.org for a give
 
 ### Fetching source distribution url's from environment
 
-Running `pypisd` in your command line, the tool will fetch the packages installed in the environment where the command works. In the background, it fetches this list by runing `pip list`.
+Running `pypisd` in your command line, the tool will fetch the packages installed in the environment where the command runs. In the background, it fetches this list by runing `pip list`.
 
 
 ### Output of the CLI task
