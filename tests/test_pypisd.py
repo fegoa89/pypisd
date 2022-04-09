@@ -1,3 +1,4 @@
+import csv
 import pytest
 from unittest import mock
 from pypisd.main import cli
@@ -20,3 +21,16 @@ def mock_pypi_request_fetch_page():
 
 def test_pypisd_file_output_header_generation():
     cli()
+    with open('pypi_sd_links.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        assert reader.fieldnames == ["library_name", "version", "license", "source_distribution_link"]
+
+def test_pypisd_file_test_library_row_content():
+    cli()
+    with open('pypi_sd_links.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        first_row = next(reader)
+        assert first_row['library_name'] == 'requests'
+        assert first_row['version'] == '2.27.1'
+        assert first_row['license'] == 'Apache Software License (Apache 2.0)'
+        assert first_row['source_distribution_link'] == 'https://files.pythonhosted.org/packages/60/f3/26ff3767f099b73e0efa138a9998da67890793bfa475d8278f84a30fec77/requests-2.27.1.tar.gz'

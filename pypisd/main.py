@@ -41,10 +41,9 @@ def get_source_distribution_link_for_library(library, version, timeout=10):
         url = f"https://pypi.org/project/{library}/#files"
 
     page = requests.get(url)
-    print(page.text)
     soup = BeautifulSoup(page.text, 'html.parser')
     library_license = soup.find('strong',text='License:')
-    library_license = library_license.next_sibling if library_license else "Not found"
+    library_license = library_license.next_sibling.strip() if library_license else "Not found"
     get_download_link_div = soup.find("div", {"class": "card file__card"})
 
     if get_download_link_div:
@@ -57,6 +56,6 @@ def write_library_info_to_csv(sd_list):
     with open('pypi_sd_links.csv', 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
         # write the header
-        writer.writerow(['library_name', "version", "license", "source_distribution_link"])
+        writer.writerow(["library_name", "version", "license", "source_distribution_link"])
         # write multiple rows
         writer.writerows(sd_list)
