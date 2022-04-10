@@ -7,3 +7,4 @@ Flask
 cycler>=0.10.0
 decorator>4.3.0
 defusedxml<0.5.0
+requests,2.27.1
