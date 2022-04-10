@@ -20,6 +20,11 @@ def requirements_input_file():
     with mock.patch('pypisd.main.argparse.ArgumentParser.parse_args', return_value=argparse.Namespace(input_file=requirements_file_path, output_file='pypi_sd_links_from_file.csv')):
         yield mock
 
+@pytest.fixture()
+def toml_input_file():
+    toml_file_path = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/tests/pyproject_test.toml"
+    with mock.patch('pypisd.main.argparse.ArgumentParser.parse_args', return_value=argparse.Namespace(input_file=toml_file_path, output_file='pypi_sd_links_from_file.csv')):
+        yield mock
 
 def test_pypisd_file_output_header_generation(requirements_input_file):
     cli()
@@ -57,3 +62,19 @@ def test_pypisd_file_test_library_row_content(requirements_input_file):
         assert reader_list[8]["version"] == "0.5.0"
         assert reader_list[9]["library_name"] == "requests"
         assert reader_list[9]["version"] == "2.27.1"
+
+
+def test_pypisd_toml_file_input(toml_input_file):
+    cli()
+    with open('pypi_sd_links_from_file.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        reader_list = list(reader)
+        # license and source_distribution_link are the same since we
+        # are mocking the requests
+        reader_list = sorted(reader_list, key = lambda i: i['library_name'])
+        assert reader_list[0]["library_name"] == "bs4"
+        assert reader_list[0]["version"] == "0.0.1"
+        assert reader_list[1]["library_name"] == "requests"
+        assert reader_list[1]["version"] == "2.27.1"
+        assert reader_list[2]["library_name"] == "toml"
+        assert reader_list[2]["version"] == "0.10.2"

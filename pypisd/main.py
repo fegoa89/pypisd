@@ -1,8 +1,10 @@
 import os
 import re
 import csv
+import toml
 import argparse
 import requests
+import pathlib
 from subprocess import Popen, PIPE, STDOUT
 import concurrent.futures
 from bs4 import BeautifulSoup
@@ -28,13 +30,26 @@ def fetch_libraries_from_environment() -> list(list()):
     lib_list_bytes = get_pip_list_stdout()
     return extract_lib_list_from_bytes_output(lib_list_bytes)
 
-def fetch_libraries_from_file(file_path) -> list(list()):
+def fetch_libraries_from_file(file_path: str) -> list(list()):
     if not os.path.isfile(file_path):
         print("Input file do not exist")
 
-    with open(file_path) as f:
-        lines = f.readlines()
-        return [re.split("[<|>|~=|==|!=|<=|>=|===|, \!?:]+", line.strip()) for line in lines]
+    file_suffix = pathlib.Path(file_path).suffix
+    if file_suffix == ".toml":
+        return fetch_lib_list_from_toml_file(file_path)
+    else:
+        with open(file_path) as f:
+            lines = f.readlines()
+            return [re.split("[<|>|~=|==|!=|<=|>=|===|, \!?:]+", line.strip()) for line in lines]
+
+def fetch_lib_list_from_toml_file(file_path: str) -> list(list()):
+    data = toml.load(file_path)
+    dependencies = data["tool"]["poetry"]["dependencies"]
+    lib_list = []
+    for key, val in dependencies.items():
+        lib_list.append([key, re.sub(r'[(\^\s*)|(\~\s*)]', '', val)])
+
+    return lib_list
 
 def fetch__and_extract_details_for_library_list(lib_list: list) -> list(list()):
     source_distribution_list = list()
@@ -65,7 +80,7 @@ def extract_lib_list_from_bytes_output(pip_stdout: bytes) -> list:
 
     return lib_list
 
-def get_source_distribution_link_for_library(library, version, timeout=10) -> list:
+def get_source_distribution_link_for_library(library: str, version: str, timeout=10) -> list:
     if version:
         url = f"https://pypi.org/project/{library}/{version}/#files"
     else:
@@ -83,7 +98,7 @@ def get_source_distribution_link_for_library(library, version, timeout=10) -> li
     else:
         return [library, version if version else "using latest version", library_license, f"Can not find download link for {library}, version {version}"]
 
-def write_library_info_to_csv(sd_list, file_name):
+def write_library_info_to_csv(sd_list: list(list()), file_name: str):
     file_name = file_name if file_name else 'pypi_sd_links.csv'
     with open(file_name, 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)

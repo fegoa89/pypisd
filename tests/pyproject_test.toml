@@ -1,14 +1,13 @@
 [tool.poetry]
-name = "pypisd"
+name = "dummy_project"
 version = "0.1.0"
-description = "CLI tool to fetch source distribution url links from https://pypi.org for a given python package and its version."
+description = "Some description"
 authors = ["Fernando <fegoa89@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
 bs4 = "^0.0.1"
 requests = "^2.27.1"
-toml = "^0.10.2s"
+toml = "~0.10.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

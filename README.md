@@ -10,12 +10,17 @@ CLI tool to fetch source distribution url links from https://pypi.org for a give
 Running `pypisd` in your command line, the tool will fetch the packages installed in the environment where the command runs. In the background, it fetches this list by runing `pip list`.
 
 ### Fetching source distribution url's from file
-You can get the list of distribution links by providing a file that contains the list of libraries (like a requirements.txt file) or a file where in each line, library name and version are separated with a comma. You can see an example of what type of formats are allowed in `tests/test_input_file.txt`
+You can get the list of distribution links by providing a file that contains the list of libraries (like a requirements.txt file) or a file where in each line, library name and version are separated with a comma. You can see an example of what type of formats are allowed in `tests/test_input_file.txt`.
 
 ```
-$ pypisd --output_file="my_file_csv"
+$ pypisd --input_file=tests/test_input_file.txt
 ```
 
+You can provide a toml file as an input too, and will get the source distribution links for the dependencies defined inside
+
+```
+$ pypisd --input_file=tests/pyproject_test.toml
+```
 
 ### Output of the CLI task
 
