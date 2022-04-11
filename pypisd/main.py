@@ -1,3 +1,4 @@
+import sys
 import os
 import re
 import csv
@@ -32,7 +33,8 @@ def fetch_libraries_from_environment() -> list(list()):
 
 def fetch_libraries_from_file(file_path: str) -> list(list()):
     if not os.path.isfile(file_path):
-        print("Input file do not exist")
+        print(f"Input file {file_path} do not exist")
+        sys.exit(1)
 
     file_suffix = pathlib.Path(file_path).suffix
     if file_suffix == ".toml":
@@ -67,7 +69,8 @@ def get_pip_list_stdout() -> bytes:
     pip_freeze_process = Popen(['pip', 'list'], stdout=PIPE, stderr=STDOUT)
     output, error = pip_freeze_process.communicate()
     if error:
-        print("Error while getting list of libraries from environment")
+        print(f"Error while getting list of libraries from environment {error}")
+        sys.exit(1)
 
     return output
 
@@ -106,3 +109,5 @@ def write_library_info_to_csv(sd_list: list(list()), file_name: str):
         writer.writerow(["library_name", "version", "license", "source_distribution_link"])
         # write multiple rows
         writer.writerows(sd_list)
+        print(f"Results available in {file_name}")
+        sys.exit(0)
