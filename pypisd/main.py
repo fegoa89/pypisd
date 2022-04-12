@@ -51,12 +51,7 @@ def fetch_libraries_from_file(file_path: str) -> list(list()):
     if file_suffix == ".toml":
         return fetch_lib_list_from_toml_file(file_path)
     else:
-        with open(file_path) as f:
-            lines = f.readlines()
-            return [
-                re.split("[<|>|~=|==|!=|<=|>=|===|, \!?:]+", line.strip())
-                for line in lines
-            ]
+        return fetch_lib_list_from_standard_file(file_path)
 
 
 def fetch_lib_list_from_toml_file(file_path: str) -> list(list()):
@@ -67,6 +62,14 @@ def fetch_lib_list_from_toml_file(file_path: str) -> list(list()):
         lib_list.append([key, re.sub(r"[(\^\s*)|(\~\s*)]", "", val)])
 
     return lib_list
+
+
+def fetch_lib_list_from_standard_file(file_path: str) -> list(list()):
+    with open(file_path) as f:
+        lines = f.readlines()
+        return [
+            re.split("[<|>|~=|==|!=|<=|>=|===|, \!?:]+", line.strip()) for line in lines
+        ]
 
 
 def fetch__and_extract_details_for_library_list(lib_list: list) -> list(list()):
@@ -90,7 +93,6 @@ def fetch__and_extract_details_for_library_list(lib_list: list) -> list(list()):
 
 def get_pip_list_stdout() -> bytes:
     pip_freeze_process = Popen(["pip", "list"], stdout=PIPE, stderr=STDOUT)
-    print(pip_freeze_process.communicate())
     output, error = pip_freeze_process.communicate()
     if error:
         print(f"Error while getting list of libraries from environment {error}")
@@ -124,24 +126,18 @@ def get_source_distribution_link_for_library(
         library_license.next_sibling.strip() if library_license else "Not found"
     )
     get_download_link_div = soup.find("div", {"class": "card file__card"})
+    source_download_link = (
+        get_download_link_div.find("a")["href"]
+        if get_download_link_div
+        else f"Can not find download link for {library}, version {version}"
+    )
 
-    if get_download_link_div:
-        source_download_link = soup.find("div", {"class": "card file__card"}).find("a")[
-            "href"
-        ]
-        return [
-            library,
-            version if version else "using latest version",
-            library_license,
-            source_download_link,
-        ]
-    else:
-        return [
-            library,
-            version if version else "using latest version",
-            library_license,
-            f"Can not find download link for {library}, version {version}",
-        ]
+    return [
+        library,
+        version if version else "using latest version",
+        library_license,
+        source_download_link,
+    ]
 
 
 def write_library_info_to_csv(sd_list: list(list()), file_name: str):
