@@ -110,9 +110,7 @@ def extract_lib_list_from_bytes_output(pip_stdout: bytes) -> list:
     return lib_list
 
 
-def get_source_distribution_link_for_library(
-    library: str, version: str, timeout=10
-) -> list:
+def get_source_distribution_link_for_library(library: str, version: str) -> list:
     if version:
         url = f"https://pypi.org/project/{library}/{version}/#files"
     else:
