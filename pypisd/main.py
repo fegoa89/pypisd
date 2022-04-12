@@ -57,11 +57,10 @@ def fetch_libraries_from_file(file_path: str) -> list(list()):
 def fetch_lib_list_from_toml_file(file_path: str) -> list(list()):
     data = toml.load(file_path)
     dependencies = data["tool"]["poetry"]["dependencies"]
-    lib_list = []
-    for key, val in dependencies.items():
-        lib_list.append([key, re.sub(r"[(\^\s*)|(\~\s*)]", "", val)])
-
-    return lib_list
+    return [
+        [key, re.sub(r"[(\^\s*)|(\~\s*)]", "", val)]
+        for key, val in dependencies.items()
+    ]
 
 
 def fetch_lib_list_from_standard_file(file_path: str) -> list(list()):
