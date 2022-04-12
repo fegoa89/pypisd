@@ -110,4 +110,3 @@ def write_library_info_to_csv(sd_list: list(list()), file_name: str):
         # write multiple rows
         writer.writerows(sd_list)
         print(f"Results available in {file_name}")
-        sys.exit(0)

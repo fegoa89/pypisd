@@ -14,6 +14,13 @@ def mock_pip_list_command():
         mocked.return_value.communicate.return_value = (pip_list_output, None)
         yield mocked
 
+@pytest.fixture()
+def mock_pip_list_command_error():
+    with mock.patch('pypisd.main.Popen') as mocked:
+        mocked.return_value.returncode = 0
+        mocked.return_value.communicate.return_value = (None, SystemError)
+        yield mocked
+
 @pytest.fixture(autouse=True)
 def mock_pypi_request_fetch_page():
     library_html_page_response = open('tests/mock_pypi_library_page_response.html', 'r', encoding='utf-8').read()
@@ -45,3 +52,11 @@ def test_pypisd_default_file_output_name():
 def test_pypisd_file_output_name_if_provided_by_input(mock_args):
     cli()
     assert os.path.isfile("myfile.csv") == True
+
+
+def test_pypisd_error_when_reading_environment(mock_pip_list_command_error):
+    with pytest.raises(SystemExit) as e:
+        cli()
+
+    assert e.type == SystemExit
+    assert e.value.code == 1

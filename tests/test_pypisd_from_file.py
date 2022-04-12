@@ -21,6 +21,12 @@ def requirements_input_file():
         yield mock
 
 @pytest.fixture()
+def wrong_path_input_file():
+    requirements_file_path = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/tests/something_wrong.txt"
+    with mock.patch('pypisd.main.argparse.ArgumentParser.parse_args', return_value=argparse.Namespace(input_file=requirements_file_path, output_file='pypi_sd_links_from_file.csv')):
+        yield mock
+
+@pytest.fixture()
 def toml_input_file():
     toml_file_path = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/tests/pyproject_test.toml"
     with mock.patch('pypisd.main.argparse.ArgumentParser.parse_args', return_value=argparse.Namespace(input_file=toml_file_path, output_file='pypi_sd_links_from_file.csv')):
@@ -78,3 +84,10 @@ def test_pypisd_toml_file_input(toml_input_file):
         assert reader_list[1]["version"] == "2.27.1"
         assert reader_list[2]["library_name"] == "toml"
         assert reader_list[2]["version"] == "0.10.2"
+
+def test_pypisd_with_wrong_file_input(wrong_path_input_file):
+    with pytest.raises(SystemExit) as e:
+        cli()
+
+    assert e.type == SystemExit
+    assert e.value.code == 1
