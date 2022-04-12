@@ -40,7 +40,7 @@ The file has the following columns:
 
 - library_name: Name of the library.
 - version: version of the library. If none could be read from the environment/input file, "using latest version" will be used instead.
-- license: Defines the license that the library uses
+- license: Defines the license that the library uses.
 - source_distribution_link: Link to download the source distribution for this given library&version. If not found, it will be replaced by "Can not find download link for My Library, version 0.0.1"
 
 
