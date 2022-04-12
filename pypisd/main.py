@@ -32,7 +32,7 @@ def cli():
         lib_list = fetch_libraries_from_environment()
 
     # Fetch source distribution download link for each library & version
-    source_distribution_list = fetch__and_extract_details_for_library_list(lib_list)
+    source_distribution_list = fetch_and_extract_details_for_library_list(lib_list)
     # Write source distribution list to CSV
     write_library_info_to_csv(source_distribution_list, args.output_file)
 
@@ -72,7 +72,7 @@ def fetch_lib_list_from_standard_file(file_path: str) -> list(list()):
         ]
 
 
-def fetch__and_extract_details_for_library_list(lib_list: list) -> list(list()):
+def fetch_and_extract_details_for_library_list(lib_list: list) -> list(list()):
     source_distribution_list = list()
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
