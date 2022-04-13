@@ -5,7 +5,7 @@ description = "CLI tool to fetch source distribution url links from https://pypi
 authors = ["Fernando <fegoa89@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.7"
 bs4 = "^0.0.1"
 requests = "^2.27.1"
 toml = "^0.10.2"
