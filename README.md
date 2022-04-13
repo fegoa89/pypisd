@@ -2,6 +2,13 @@
 
 CLI tool to fetch source distribution url links from https://pypi.org for a given python package and its version.
 
+## Installing PyPiSD
+
+PypiSD is available on PyPi:
+
+```
+$ pip install pypisd
+```
 
 ## How to use it
 
